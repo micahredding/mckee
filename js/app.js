@@ -1,85 +1,42 @@
 var app = angular.module('mapsApp', ['uiGmapgoogle-maps']);
 
-app.service("PolygonService", function () {
-    var polygons = [];
-    this.pushPolygon = function(polygon){
-        polygons.push(polygon);
+app.service("APIService", function(){
+    this.stores = function() {
+        return current_stores;
     }
-    this.getPolygons = function(){
-        return polygons;
-    }
-    this.clearPolygons = function(){
-        angular.forEach(polygons, function(polygon){
-            polygon.setMap(null);
-        });
-        polygons = [];
+    this.current_user = function() {
+        return current_user;
     }
 });
 
-app.service("MarkerService", function () {
-    var visibleMarkers = true;
-    var cities = [
-        {
-            id : 1,
-            city : 'Toronto',
-            desc : 'This is the best city in the world!',
-            latitude : 43.7000,
-            longitude : -79.4000
-        },
-        {
-            id : 2,
-            city : 'New York',
-            desc : 'This city is aiiiiite!',
-            latitude : 40.6700,
-            longitude : -73.9400
-        },
-        {
-            id : 3,
-            city : 'Chicago',
-            desc : 'This is the second best city in the world!',
-            latitude : 41.8819,
-            longitude : -87.6278
-        },
-        {
-            id : 4,
-            city : 'Los Angeles',
-            desc : 'This city is live!',
-            latitude : 34.0500,
-            longitude : -118.2500
-        },
-        {
-            id : 5,
-            city : 'Las Vegas',
-            desc : 'Sin City...\'nuff said!',
-            latitude : 36.0800,
-            longitude : -115.1522
-        }
-    ];
-    this.markers = function() {
-        return cities;
-    }
+app.service("MarkerService", function (APIService) {
+    var display = true;
+    var stores = APIService.stores();
     this.visible = function() {
-        return visibleMarkers;
+        return display;
+    }
+    this.visibleMarkers = function() {
+        if(display) {
+            return stores;
+        } else {
+            return [];
+        }
     }
     this.toggleMarkers = function() {
-        visibleMarkers = !visibleMarkers;
+        display = !display;
     }
     this.hideMarkers = function() {
-        visibleMarkers = false;
+        display = false;
+    }
+    this.showMarkers = function() {
+        display = true;
     }
 });
 
-app.controller('mapCtrl', function($scope, MarkerService, PolygonService, uiGmapIsReady) {
-
-    $scope.map = {
-        center: { latitude: 45, longitude: -73 },
-        zoom: 3,
-        options: {
-            streetViewControl: false
-        }
-    };
-
-    $scope.drawingManagerOptions = {
+app.service("DrawingService", function () {
+    var polygons = [];
+    var drawingManager = null;
+    this.options = {
         drawingMode: google.maps.drawing.OverlayType.POLYGON,
         drawingControl: false,
         drawingControlOptions: {
@@ -94,39 +51,56 @@ app.controller('mapCtrl', function($scope, MarkerService, PolygonService, uiGmap
             zIndex: 1
         }
     };
-    $scope.drawingManagerControl = {};
-
-    uiGmapIsReady.promise(1).then(function(instances) {
-        var drawingManager = $scope.drawingManagerControl.getDrawingManager();
+    this.control = {};
+    this.getDrawingManager = function() {
+        if(!this.control.getDrawingManager) {
+            return false;
+        } else {
+            drawingManager = this.control.getDrawingManager();
+            return drawingManager;
+        }
+    }
+    this.addListener = function() {
+        if(!this.getDrawingManager()) {return;}
         google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
-            PolygonService.pushPolygon(polygon);
+            polygons.push(polygon);
             drawingManager.setDrawingMode(null)
         });
-    });
+    };
+    this.clear = function (){
+        if(!this.getDrawingManager()) {return;}
+        angular.forEach(polygons, function(polygon){
+            polygon.setMap(null);
+        });
+        polygons = [];
+        drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+    };
+});
 
-    $scope.$watch(function(){ return PolygonService.getPolygons(); },
-        function(newValue, oldValue) {
-            if($scope.drawingManagerControl && $scope.drawingManagerControl.getDrawingManager) {
-                if(newValue.length < 1) {
-                    var drawingManager = $scope.drawingManagerControl.getDrawingManager();
-                    drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON)
-                }
-            }
+app.controller('mapCtrl', function($scope, MarkerService, DrawingService, uiGmapIsReady) {
+    $scope.map = {
+        center: { latitude: 45, longitude: -73 },
+        zoom: 3,
+        options: {
+            streetViewControl: false
         }
-    );
+    };
+
+    $scope.drawingManagerOptions = DrawingService.options;
+    $scope.drawingManagerControl = DrawingService.control;
+
+    uiGmapIsReady.promise(1).then(function(instances) {
+        DrawingService.addListener();
+    });
 
     $scope.$watch(function() { return MarkerService.visible(); },
         function(newValue, oldValue) {
-            if(newValue) {
-                $scope.markers = MarkerService.markers();
-            } else {
-                $scope.markers = [];
-            }
+            $scope.markers = MarkerService.visibleMarkers();
         }
     );
 });
 
-app.controller('controlMarkers', function ($scope, MarkerService, $rootScope) {
+app.controller('markerCtrl', function ($scope, MarkerService, $rootScope) {
     this.text = 'Toggle Markers';
     $scope.display = true;
     $scope.controlClick = function () {
@@ -136,27 +110,36 @@ app.controller('controlMarkers', function ($scope, MarkerService, $rootScope) {
         MarkerService.hideMarkers();
         $scope.display = false;
     });
-});
-
-app.controller('controlTerritories', function ($scope, MarkerService, PolygonService, $rootScope) {
-    this.text = 'Clear Territory';
-    $scope.display = true;
-    $scope.controlClick = function (event) {
-        return PolygonService.clearPolygons();
-    };
-    $rootScope.$on('hideAll', function(event, args) {
-        $scope.display = false;
+    $rootScope.$on('showAll', function(event, args) {
+        MarkerService.showMarkers();
+        $scope.display = true;
     });
 });
 
-app.controller('userCtrl', function ($scope) {
-    this.name = 'John Kelsey';
-    this.ar = "AR1212";
+app.controller('territoryCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
+    this.text = 'Clear Territory';
+    $scope.display = true;
+    $scope.controlClick = function (event) {
+        return DrawingService.clear();
+    };
+    // $rootScope.$on('hideAll', function(event, args) {
+    //     $scope.display = false;
+    // });
+    // $rootScope.$on('showAll', function(event, args) {
+    //     $scope.display = true;
+    // });
+});
+
+app.controller('userCtrl', function ($scope, APIService) {
+    var user = APIService.current_user();
+    this.name = user.name;
+    this.ar = user.ar;
+    $scope.date = new Date();
 });
 
 app.controller('printCtrl', function ($scope, $rootScope) {
     this.text = 'Print!';
-    $scope.controlClick = function(event){
-        $rootScope.$emit('hideAll');
-    };
+    // $scope.controlClick = function(event){
+    //     $rootScope.$emit('hideAll');
+    // };
 });

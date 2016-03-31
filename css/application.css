@@ -1,1 +1,8 @@
+#page-wrapper {
+  margin: 2em auto;
+  max-width: 800px;
+}
+#control-wrapper {
+  text-align: right;
+}
 .angular-google-map-container { height: 300px; width: 800px;}
