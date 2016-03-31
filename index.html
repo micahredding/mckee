@@ -34,9 +34,26 @@
                     <button ng-click="controlClick()" ng-show="display">{{control.text}}</button>
                 </script>
                 <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options">
-                    <ui-gmap-markers models="markers" coords="'self'" labelContent="'desc'" labelAnchor="100 0"  labelClass="marker-labels" icon="'icon'">
+                    <ui-gmap-marker coords="{latitude: marker.latitude, longitude: marker.longitude}" options="marker.options" events="marker.events" click="onClick()" idkey="marker.id" ng-repeat="marker in markers">
+
+                        <ui-gmap-window options="windowOptions" closeClick="closeClick()">
+                            <div>{{marker.name}}</div>
+                        </ui-gmap-window>
+
+                    </ui-gmap-marker>
+
+
+
+<!--                     <ui-gmap-markers
+                        models="markers"
+                        coords="'self'"
+                        labelContent="'desc'" labelAnchor="100 0"  labelClass="marker-labels"
+                        icon="'icon'"
+                        >
+                    </ui-gmap-markers>
 
                     <ui-gmap-drawing-manager options="drawingManagerOptions" control="drawingManagerControl"></ui-gmap-drawing-manager>
+ -->
 
 <!--                     <ui-gmap-map-control template="control.tpl.html" position="top-right" controller="territoryCtrl as control" index="-1"></ui-gmap-map-control>
                     <ui-gmap-map-control template="control.tpl.html" position="top-right" controller="markerCtrl as control" index="-2"></ui-gmap-map-control> -->
