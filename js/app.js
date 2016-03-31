@@ -12,6 +12,8 @@ app.service("APIService", function(){
 app.service("MarkerService", function (APIService) {
     var display = true;
     var stores = APIService.stores();
+    var bounds = new google.maps.LatLngBounds();
+
     this.visible = function() {
         return display;
     }
@@ -21,6 +23,13 @@ app.service("MarkerService", function (APIService) {
         } else {
             return [];
         }
+    }
+    this.visibleBounds = function() {
+        angular.forEach(stores, function(value, key){
+            var myLatLng = new google.maps.LatLng(value.latitude, value.longitude);
+            bounds.extend(myLatLng);
+        });
+        return bounds;
     }
     this.toggleMarkers = function() {
         display = !display;
@@ -42,7 +51,7 @@ app.service("DrawingService", function () {
         drawingControlOptions: {
           position: google.maps.ControlPosition.TOP_CENTER,
             drawingModes: [
-              google.maps.drawing.OverlayType.POLYGON
+                google.maps.drawing.OverlayType.POLYGON
             ]
         },
         polygonOptions: {
@@ -88,8 +97,8 @@ app.controller('mapCtrl', function($scope, MarkerService, DrawingService, uiGmap
 
     $scope.drawingManagerOptions = DrawingService.options;
     $scope.drawingManagerControl = DrawingService.control;
-
     uiGmapIsReady.promise(1).then(function(instances) {
+        instances[0].map.fitBounds(MarkerService.visibleBounds());
         DrawingService.addListener();
     });
 

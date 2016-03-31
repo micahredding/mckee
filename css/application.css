@@ -2,7 +2,29 @@
   margin: 2em auto;
   max-width: 800px;
 }
-#control-wrapper {
+#button-control-wrapper {
+  margin-bottom: 1em;
   text-align: right;
 }
+#user-control-wrapper {
+  margin-top: 1em;
+}
+.signature-box {
+  border-bottom: 1px solid black;
+  min-height: 2em;
+}
+.signature-box .placeholder {
+  color: #999999;
+  font-style: italic;
+}
 .angular-google-map-container { height: 300px; width: 800px;}
+
+@media print {
+  #button-control-wrapper {
+    display: none;
+    height: 0;
+  }
+  .signature-box .placeholder {
+    display: none;
+  }
+}
