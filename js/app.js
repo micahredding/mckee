@@ -1,9 +1,6 @@
 var app = angular.module('mapsApp', ['uiGmapgoogle-maps']);
 
 app.service("APIService", function(){
-    this.stores = function() {
-        return current_stores;
-    }
     this.current_user = function() {
         return current_user;
     }
@@ -11,21 +8,48 @@ app.service("APIService", function(){
 
 app.service("MarkerService", function (APIService) {
     var display = true;
-    var stores = APIService.stores();
     var bounds = new google.maps.LatLngBounds();
+    var internal_stores = [];
 
-    this.visible = function() {
-        return display;
+    this.stores_into_markers = function(data) {
+        $.each(data, function(key, item) {
+            internal_stores.push({
+                id:        key,
+                name:      item['NameWithNumber'],
+                latitude:  item['Latitude'],
+                longitude: item['Longitude'],
+                options: {
+                    visible: true,
+                }
+            });
+        });
     }
-    this.visibleMarkers = function() {
-        if(display) {
-            return stores;
-        } else {
-            return [];
+    this.update_marker_visibility = function(value) {
+        for (var i=0, l=internal_stores.length; i<l; i++){
+            internal_stores[i].options.visible = value;
         }
     }
+
+    this.markers = function() {
+        if(!$.isEmptyObject(internal_stores)){
+            return internal_stores;
+        }
+        this.stores_into_markers(current_stores);
+        return internal_stores;
+        // var url = 'https://gist.githubusercontent.com/micahredding/7f65f07df3825d5e11504e2da158824f/raw/ecf408b9288caec21fa2c168f5c73a37c6c7fa9d/stores.json';
+        // $.getJSON(url, function(data){
+        //     this.stores_into_markers(data);
+        // }).done(function(){
+        //     console.log( "second success" );
+        //     console.log(internal_stores);
+        //     return internal_stores;
+        // }).fail(function() {
+        //     console.log( "error" );
+        //     return [];
+        // });
+    }
     this.visibleBounds = function() {
-        angular.forEach(stores, function(value, key){
+        angular.forEach(this.markers(), function(value, key){
             var myLatLng = new google.maps.LatLng(value.latitude, value.longitude);
             bounds.extend(myLatLng);
         });
@@ -33,12 +57,15 @@ app.service("MarkerService", function (APIService) {
     }
     this.toggleMarkers = function() {
         display = !display;
+        this.update_marker_visibility(display);
     }
     this.hideMarkers = function() {
         display = false;
+        this.update_marker_visibility(display);
     }
     this.showMarkers = function() {
         display = true;
+        this.update_marker_visibility(display);
     }
 });
 
@@ -94,49 +121,13 @@ app.controller('mapCtrl', function($scope, MarkerService, DrawingService, uiGmap
             streetViewControl: false
         }
     };
-
     $scope.drawingManagerOptions = DrawingService.options;
     $scope.drawingManagerControl = DrawingService.control;
+    $scope.markers               = MarkerService.markers();
     uiGmapIsReady.promise(1).then(function(instances) {
         instances[0].map.fitBounds(MarkerService.visibleBounds());
         DrawingService.addListener();
     });
-
-    $scope.$watch(function() { return MarkerService.visible(); },
-        function(newValue, oldValue) {
-            $scope.markers = MarkerService.visibleMarkers();
-        }
-    );
-});
-
-app.controller('markerCtrl', function ($scope, MarkerService, $rootScope) {
-    this.text = 'Toggle Markers';
-    $scope.display = true;
-    $scope.controlClick = function () {
-        return MarkerService.toggleMarkers();
-    };
-    $rootScope.$on('hideAll', function(event, args) {
-        MarkerService.hideMarkers();
-        $scope.display = false;
-    });
-    $rootScope.$on('showAll', function(event, args) {
-        MarkerService.showMarkers();
-        $scope.display = true;
-    });
-});
-
-app.controller('territoryCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
-    this.text = 'Clear Territory';
-    $scope.display = true;
-    $scope.controlClick = function (event) {
-        return DrawingService.clear();
-    };
-    // $rootScope.$on('hideAll', function(event, args) {
-    //     $scope.display = false;
-    // });
-    // $rootScope.$on('showAll', function(event, args) {
-    //     $scope.display = true;
-    // });
 });
 
 app.controller('userCtrl', function ($scope, APIService) {
@@ -146,9 +137,28 @@ app.controller('userCtrl', function ($scope, APIService) {
     $scope.date = new Date();
 });
 
-app.controller('printCtrl', function ($scope, $rootScope) {
+app.controller('territoryCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
+    this.text = 'Clear Territory';
+    $scope.display = true;
+    $scope.controlClick = function (event) {
+        return DrawingService.clear();
+    };
+});
+
+app.controller('markerCtrl', function ($scope, MarkerService, $rootScope) {
+    this.text = 'Toggle Markers';
+    $scope.display = true;
+    $scope.controlClick = function () {
+        return MarkerService.toggleMarkers();
+    };
+});
+
+app.controller('printCtrl', function ($scope, $rootScope, MarkerService) {
     this.text = 'Print!';
-    // $scope.controlClick = function(event){
-    //     $rootScope.$emit('hideAll');
-    // };
+    $scope.controlClick = function(event){
+        MarkerService.hideMarkers()
+        setTimeout(function(){
+            window.print();
+        }, 1000);
+    };
 });

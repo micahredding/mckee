@@ -10,38 +10,35 @@
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
         <!-- Place favicon.ico in the root directory -->
 
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css">
+<!--         <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css"> -->
+<!--         <script src="js/vendor/modernizr-2.8.3.min.js"></script> -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
         <link rel="stylesheet" href="css/application.css">
-        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
     </head>
     <body>
-        <div id="page-wrapper">
-            <div id="button-control-wrapper">
-                <span ng-controller="territoryCtrl as control">
-                    <button ng-click="controlClick()">{{control.text}}</button>
-                </span>
-                <span ng-controller="markerCtrl as control">
-                    <button ng-click="controlClick()">{{control.text}}</button>
-                </span>
-                <span ng-controller="printCtrl as control">
-                    <button ng-click="controlClick()">{{control.text}}</button>
-                </span>
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <a class="navbar-brand">Location Builder</a>
+                <div class="navbar-right">
+                    <button ng-click="controlClick()" ng-controller="territoryCtrl as control" class="btn btn-default navbar-btn">{{control.text}}</button>
+                    <button ng-click="controlClick()" ng-controller="markerCtrl as control" class="btn btn-default navbar-btn">{{control.text}}</button>
+                    <button ng-click="controlClick()" ng-controller="printCtrl as control" class="btn btn-default navbar-btn">{{control.text}}</button>
+                </div>
             </div>
+        </nav>
 
+        <div id="page-wrapper" class="container">
             <div ng-controller="mapCtrl">
-                <script type="text/ng-template" id="control.tpl.html">
-                    <button ng-click="controlClick()" ng-show="display">{{control.text}}</button>
-                </script>
                 <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options">
                     <ui-gmap-marker coords="{latitude: marker.latitude, longitude: marker.longitude}" options="marker.options" events="marker.events" click="onClick()" idkey="marker.id" ng-repeat="marker in markers">
-
                         <ui-gmap-window options="windowOptions" closeClick="closeClick()">
                             <div>{{marker.name}}</div>
                         </ui-gmap-window>
-
                     </ui-gmap-marker>
 
+                    <ui-gmap-drawing-manager options="drawingManagerOptions" control="drawingManagerControl"></ui-gmap-drawing-manager>
 
 
 <!--                     <ui-gmap-markers
@@ -52,7 +49,6 @@
                         >
                     </ui-gmap-markers>
 
-                    <ui-gmap-drawing-manager options="drawingManagerOptions" control="drawingManagerControl"></ui-gmap-drawing-manager>
  -->
 
 <!--                     <ui-gmap-map-control template="control.tpl.html" position="top-right" controller="territoryCtrl as control" index="-1"></ui-gmap-map-control>
@@ -66,7 +62,6 @@
                     {{user.ar}}<br />
                     {{date | date:'MMMM dd, yyyy'}}
                     <p class="signature-box"><span class="placeholder">(sign here)</span></p>
-<!--                     <p class="date-box">{{date | date:'MMMM dd, yyyy'}}</p> -->
                 </div>
             </div>
         </div>
@@ -81,5 +76,6 @@
         <script src='js/vendor/maplabel-compiled.js'></script>
         <script src='js/variables.js'></script>
         <script src='js/app.js'></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     </body>
 </html>
