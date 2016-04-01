@@ -1,6 +1,20 @@
 var current_user = {
-    name: 'John Kelsey',
-    ar:   'AR1212'
+  "DistributorID": 2435,
+  "DivisionID": 5,
+  "RegionID": 1,
+  "DistrictID": 5,
+  "Type": "3",
+  "Territory": null,
+  "EmployeeID": 1398,
+  "UserID": "pda14629",
+  "Name": "Abel, Phil",
+  "JobTitle": "District Sales Representative",
+  "EmailAddress": null,
+  "EmailName": "Phil Abel",
+  "SupervisorID": 5925,
+  "SupervisorUserID": "tfz14924",
+  "Supervisor": null,
+  "Employees": null
 };
 var current_stores = [
   {

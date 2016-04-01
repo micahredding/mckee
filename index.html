@@ -9,10 +9,6 @@
 
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
         <!-- Place favicon.ico in the root directory -->
-
-<!--         <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css"> -->
-<!--         <script src="js/vendor/modernizr-2.8.3.min.js"></script> -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
         <link rel="stylesheet" href="css/application.css">
@@ -39,27 +35,13 @@
                     </ui-gmap-marker>
 
                     <ui-gmap-drawing-manager options="drawingManagerOptions" control="drawingManagerControl"></ui-gmap-drawing-manager>
-
-
-<!--                     <ui-gmap-markers
-                        models="markers"
-                        coords="'self'"
-                        labelContent="'desc'" labelAnchor="100 0"  labelClass="marker-labels"
-                        icon="'icon'"
-                        >
-                    </ui-gmap-markers>
-
- -->
-
-<!--                     <ui-gmap-map-control template="control.tpl.html" position="top-right" controller="territoryCtrl as control" index="-1"></ui-gmap-map-control>
-                    <ui-gmap-map-control template="control.tpl.html" position="top-right" controller="markerCtrl as control" index="-2"></ui-gmap-map-control> -->
                 </ui-gmap-google-map>
             </div>
 
             <div ng-controller="userCtrl as user" id="user-control-wrapper">
                 <div>
-                    {{user.name}}<br />
-                    {{user.ar}}<br />
+                    {{name}}<br />
+                    {{ar}}<br />
                     {{date | date:'MMMM dd, yyyy'}}
                     <p class="signature-box"><span class="placeholder">(sign here)</span></p>
                 </div>

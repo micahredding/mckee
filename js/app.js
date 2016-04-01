@@ -1,60 +1,56 @@
 var app = angular.module('mapsApp', ['uiGmapgoogle-maps']);
 
-app.service("APIService", function(){
-    this.current_user = function() {
-        return current_user;
+app.service("UserService", function($http){
+    var user = {};
+    this.getUser = function(callback) {
+        var url = 'https://gist.githubusercontent.com/micahredding/bbf0326b33962fcbed503535a5e4e476/raw/a1042fe5ab9bb831a08f7599ad5a33626d92ce15/current_user.json';
+        $http({
+            method: 'GET',
+            url: url,
+         }).success(function(data){
+            user["name"] = data["Name"];
+            user["ar"]   = data["DistributorID"];
+            callback(user);
+        }).error(function(){
+            console.log("error");
+        });
     }
 });
 
-app.service("MarkerService", function (APIService) {
+app.service("MarkerService", function ($http) {
     var display = true;
     var bounds = new google.maps.LatLngBounds();
     var internal_stores = [];
 
-    this.stores_into_markers = function(data) {
-        $.each(data, function(key, item) {
-            internal_stores.push({
-                id:        key,
-                name:      item['NameWithNumber'],
-                latitude:  item['Latitude'],
-                longitude: item['Longitude'],
-                options: {
-                    visible: true,
-                }
-            });
-        });
-    }
     this.update_marker_visibility = function(value) {
         for (var i=0, l=internal_stores.length; i<l; i++){
             internal_stores[i].options.visible = value;
         }
     }
 
-    this.markers = function() {
-        if(!$.isEmptyObject(internal_stores)){
-            return internal_stores;
-        }
-        this.stores_into_markers(current_stores);
-        return internal_stores;
-        // var url = 'https://gist.githubusercontent.com/micahredding/7f65f07df3825d5e11504e2da158824f/raw/ecf408b9288caec21fa2c168f5c73a37c6c7fa9d/stores.json';
-        // $.getJSON(url, function(data){
-        //     this.stores_into_markers(data);
-        // }).done(function(){
-        //     console.log( "second success" );
-        //     console.log(internal_stores);
-        //     return internal_stores;
-        // }).fail(function() {
-        //     console.log( "error" );
-        //     return [];
-        // });
-    }
-    this.visibleBounds = function() {
-        angular.forEach(this.markers(), function(value, key){
-            var myLatLng = new google.maps.LatLng(value.latitude, value.longitude);
-            bounds.extend(myLatLng);
+    this.getMarkers = function(callback) {
+        var url = 'https://gist.githubusercontent.com/micahredding/7f65f07df3825d5e11504e2da158824f/raw/ecf408b9288caec21fa2c168f5c73a37c6c7fa9d/stores.json';
+        $http({
+            method: 'GET',
+            url: url,
+         }).success(function(data){
+            $.each(data, function(key, item) {
+                internal_stores.push({
+                    id:        key,
+                    name:      item['NameWithNumber'],
+                    latitude:  item['Latitude'],
+                    longitude: item['Longitude'],
+                    options: {
+                        visible: true,
+                    }
+                });
+            });
+            callback(internal_stores);
+        }).error(function(){
+            console.log("error");
         });
-        return bounds;
     }
+
     this.toggleMarkers = function() {
         display = !display;
         this.update_marker_visibility(display);
@@ -114,6 +110,7 @@ app.service("DrawingService", function () {
 });
 
 app.controller('mapCtrl', function($scope, MarkerService, DrawingService, uiGmapIsReady) {
+    var bounds = new google.maps.LatLngBounds();
     $scope.map = {
         center: { latitude: 45, longitude: -73 },
         zoom: 3,
@@ -123,17 +120,28 @@ app.controller('mapCtrl', function($scope, MarkerService, DrawingService, uiGmap
     };
     $scope.drawingManagerOptions = DrawingService.options;
     $scope.drawingManagerControl = DrawingService.control;
-    $scope.markers               = MarkerService.markers();
+
+    MarkerService.getMarkers(function(response) {
+        $scope.markers = response;
+        angular.forEach($scope.markers, function(value, key){
+            var myLatLng = new google.maps.LatLng(value.latitude, value.longitude);
+            bounds.extend(myLatLng);
+        });
+        uiGmapIsReady.promise(1).then(function(instances) {
+            instances[0].map.fitBounds(bounds);
+        });
+    });
+
     uiGmapIsReady.promise(1).then(function(instances) {
-        instances[0].map.fitBounds(MarkerService.visibleBounds());
         DrawingService.addListener();
     });
 });
 
-app.controller('userCtrl', function ($scope, APIService) {
-    var user = APIService.current_user();
-    this.name = user.name;
-    this.ar = user.ar;
+app.controller('userCtrl', function ($scope, UserService) {
+    UserService.getUser(function(response){
+        $scope.name = response.name;
+        $scope.ar = response.ar;
+    });
     $scope.date = new Date();
 });
 
