@@ -1,9 +1,8 @@
 body {
   margin-top: 8rem;
 }
-#button-control-wrapper {
-  margin-bottom: 1em;
-  text-align: right;
+nav.navbar .navbar-btn {
+  min-width: 150px;
 }
 #user-control-wrapper {
   margin-top: 1em;

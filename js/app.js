@@ -22,6 +22,10 @@ app.service("MarkerService", function ($http) {
     var bounds = new google.maps.LatLngBounds();
     var internal_stores = [];
 
+    this.visible = function() {
+        return display;
+    }
+
     this.update_marker_visibility = function(value) {
         for (var i=0, l=internal_stores.length; i<l; i++){
             internal_stores[i].options.visible = value;
@@ -146,25 +150,33 @@ app.controller('userCtrl', function ($scope, UserService) {
 });
 
 app.controller('territoryCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
-    this.text = 'Clear Territory';
-    $scope.display = true;
+    $scope.text = 'Clear Territory';
     $scope.controlClick = function (event) {
         return DrawingService.clear();
     };
 });
 
 app.controller('markerCtrl', function ($scope, MarkerService, $rootScope) {
-    this.text = 'Toggle Markers';
-    $scope.display = true;
-    $scope.controlClick = function () {
-        return MarkerService.toggleMarkers();
+    $scope.text = 'Hide Markers';
+    $scope.controlClick = function() {
+        MarkerService.toggleMarkers();
     };
+    $scope.$watch(
+        function(){return MarkerService.visible();},
+        function(newValue, oldValue) {
+            if(newValue) {
+                $scope.text = 'Hide Markers';
+            } else {
+                $scope.text = 'Show Markers';
+            }
+        }
+    );
 });
 
 app.controller('printCtrl', function ($scope, $rootScope, MarkerService) {
-    this.text = 'Print!';
+    $scope.text = 'Print!';
     $scope.controlClick = function(event){
-        MarkerService.hideMarkers()
+        MarkerService.hideMarkers();
         setTimeout(function(){
             window.print();
         }, 1000);
