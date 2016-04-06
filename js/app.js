@@ -73,6 +73,7 @@ app.service("MarkerService", function ($http) {
 app.service("DrawingService", function () {
     var polygons = [];
     var drawingManager = null;
+    var drawingManagerMode = null;
     this.options = {
         drawingMode: google.maps.drawing.OverlayType.POLYGON,
         drawingControl: false,
@@ -101,16 +102,23 @@ app.service("DrawingService", function () {
         if(!this.getDrawingManager()) {return;}
         google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
             polygons.push(polygon);
-            drawingManager.setDrawingMode(null)
+            this.setDrawingMode(null)
         });
     };
+    this.setDrawingMode = function(mode) {
+        drawingManagerMode = mode;
+        drawingManager.setDrawingMode(drawingManagerMode);
+    }
+    this.mode = function(){
+        return drawingManagerMode;
+    }
     this.clear = function (){
         if(!this.getDrawingManager()) {return;}
         angular.forEach(polygons, function(polygon){
             polygon.setMap(null);
         });
         polygons = [];
-        drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+        this.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
     };
 });
 
@@ -149,6 +157,48 @@ app.controller('userCtrl', function ($scope, UserService) {
     });
     $scope.date = new Date();
 });
+
+
+app.controller('territoryToolCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
+    $scope.text = 'Territory Tool';
+    $scope.activeClass = 'active';
+    $scope.controlClick = function (event) {
+        return DrawingService.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+    };
+    $scope.$watch(
+        function(){return DrawingService.mode();},
+        function(newValue, oldValue){
+            console.log(newValue);
+            if(newValue == google.maps.drawing.OverlayType.POLYGON) {
+                $scope.activeClass = 'active';
+            } else {
+                $scope.activeClass = null;
+            }
+    });
+});
+app.controller('storeToolCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
+    $scope.text = 'Store Tool';
+    $scope.controlClick = function (event) {
+        return DrawingService.setDrawingMode(null);
+    };
+    $scope.$watch(
+        function(){return DrawingService.mode();},
+        function(newValue, oldValue){
+            console.log(newValue);
+            if(newValue == null) {
+                $scope.activeClass = 'active';
+            } else {
+                $scope.activeClass = null;
+            }
+    });
+});
+app.controller('handToolCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
+    $scope.text = 'Hand Tool';
+    $scope.controlClick = function (event) {
+        return DrawingService.clear();
+    };
+});
+
 
 app.controller('territoryCtrl', function ($scope, MarkerService, DrawingService, $rootScope) {
     $scope.text = 'Clear Territory';

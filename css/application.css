@@ -4,6 +4,12 @@ body {
 nav.navbar .navbar-btn {
   min-width: 150px;
 }
+nav.navbar .btn-group {
+  margin-right: 1em;
+}
+nav.navbar .btn-group .navbar-btn {
+  min-width: auto;
+}
 #user-control-wrapper {
   margin-top: 1em;
 }
