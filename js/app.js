@@ -46,6 +46,7 @@ app.service("MarkerService", function ($http) {
                     longitude: item['Longitude'],
                     options: {
                         visible: true,
+                        labelContent: item['NameWithNumber']
                     }
                 });
             });

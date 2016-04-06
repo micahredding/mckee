@@ -29,3 +29,11 @@ nav.navbar .navbar-btn {
     margin-top: 0;
   }
 }
+
+.markerLabels {
+  background-color: white;
+  opacity: 0.7;
+  padding: 1px;
+  text-align: center;
+}
+
