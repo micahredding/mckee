@@ -43,8 +43,8 @@ app.service("MarkerService", function ($http) {
                     latitude:  item['Latitude'],
                     longitude: item['Longitude'],
                     options: {
-                        visible: true,
-                        labelContent: item['NameWithNumber']
+                        visible: true
+                        // labelContent: item['NameWithNumber']
                     }
                 });
                 var myLatLng = new google.maps.LatLng(item['Latitude'], item['Longitude']);
@@ -93,7 +93,8 @@ app.service("DrawingService", function () {
         }
     }
     this.setDrawingMode = function(mode) {
-        options['drawingMode'] = mode;
+        drawingManager.setDrawingMode(mode);
+        // this.options['drawingMode'] = mode; // needed for toolbar
     }
     this.setDrawingModePolygon = function() {
         this.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);

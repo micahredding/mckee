@@ -31,19 +31,6 @@ app.controller('territoryToolCtrl', function ($scope, MarkerService, DrawingServ
     $scope.controlClick = function (event) {
         return DrawingService.setDrawingModePolygon();
     };
-    // $scope.$watch(
-    //     function(){return DrawingService.getPolygonCount();},
-    //     function(newValue, oldValue) {
-    //         console.log(newValue);
-    //         if(newValue > 0) {
-    //             DrawingService.setDrawingModeHand();
-    //             $scope.activeClass = null;
-    //             $scope.disabledClass = 'disabled';
-    //         } else {
-    //             $scope.disabledClass = null;
-    //         }
-    //     }
-    // );
     $scope.$watch(
         function(){return DrawingService.getDrawingMode();},
         function(newValue, oldValue) {
