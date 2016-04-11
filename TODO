@@ -1,5 +1,5 @@
 + reset print
 + center on bounds
 + info windows
-- sync info windows
+X sync info windows
 - REST api
