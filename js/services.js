@@ -116,9 +116,9 @@ app.service("DrawingService", function () {
     };
     this.addListener = function() {
         if(!this.getDrawingManager()) {return;}
-        var setDrawingModeHand = this.setDrawingModeHand;
         google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
             polygons.push(polygon);
+            this.setDrawingMode(null);
         });
     };
 });
