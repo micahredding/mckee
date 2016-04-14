@@ -34,6 +34,9 @@ nav.navbar .btn-group .navbar-btn {
   body {
     margin-top: 0;
   }
+  .gm-style-cc {
+    display: none;
+  }
 }
 
 .markerLabels {
