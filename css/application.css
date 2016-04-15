@@ -13,6 +13,9 @@ nav.navbar .btn-group .navbar-btn {
 #user-control-wrapper {
   margin-top: 1em;
 }
+#user-control-wrapper input {
+  border: none;
+}
 .signature-box {
   border-bottom: 1px solid black;
   min-height: 3rem;
@@ -36,6 +39,9 @@ nav.navbar .btn-group .navbar-btn {
   }
   .gm-style-cc {
     display: none;
+  }
+  #user-control-wrapper input {
+    border: none;
   }
 }
 

@@ -44,8 +44,8 @@
 
             <div ng-controller="userCtrl as user" id="user-control-wrapper">
                 <div>
-                    {{name}}<br />
-                    {{ar}}<br />
+                    <input type="textfield" value="{{name}}" /><br />
+                    <input type="textfield" value="{{ar}}" /><br />
                     {{date | date:'MMMM dd, yyyy'}}
                     <p class="signature-box"><span class="placeholder">(sign here)</span></p>
                 </div>
